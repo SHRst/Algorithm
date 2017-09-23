@@ -1,0 +1,120 @@
+//HDU 1166：http://acm.hdu.edu.cn/showproblem.php?pid=1166
+//
+//题目分析
+//将一组数组a[N]
+//输入Query a b，输出SUM（ai + …… + aj）
+//输入Add i j，s[i] = s[i] + j
+//输入Sub  i j，s[j] = s[i] -  j
+
+
+#include<iostream>
+#include<cstdio>
+#include<cstdlib>
+#include<cstring>
+#include<string.h>
+#include<algorithm>
+using namespace std;
+#define maxn 50050
+#define mod 1000000000
+int n;
+int a[maxn];
+int t=0;
+
+int lowbit(int x)
+{
+    return x&(-x);
+}
+
+struct node
+{
+    int len;
+    int kind;
+    node()
+    {
+        len =0;
+        kind=0;
+    }
+    node(int _len,int _kind)
+    {
+        len=_len;
+        kind=_kind;
+    }
+    node operator +(const node &tmp)const
+    {
+        if(len<tmp.len) return tmp;
+        if(len == tmp.len) return node(len,(kind+tmp.kind)%mod);
+        return (*this);
+    }
+} b[2*maxn];
+
+node getSum(int x)
+{
+    node tmp;
+    while(x>0)
+    {
+        tmp = tmp +b[x];
+        x-=lowbit(x);
+        t++;
+    }
+    return tmp;
+}
+
+void update(int x,node tmp)
+{
+    while(x<=n)
+    {
+        b[x]=b[x]+tmp;
+        x+=lowbit(x);
+    }
+}
+
+
+void remove(int x)
+{
+    while(x<=n)
+    {
+        b[x].kind=0;
+        x+=lowbit(x);
+    }
+}
+
+char s[100];
+
+int main()
+{
+
+   // freopen("1.txt","r",stdin);
+
+    int cas;
+    scanf("%d",&cas);
+ //   cout<<cas<<endl;
+    int tmp,t1,t2;
+    for(int ca=1;ca<=cas;ca++){
+        cout<<"Case "<<ca<<":"<<endl;
+        scanf("%d",&n);
+        for(int i=1;i<=n;i++){
+            scanf("%d",&tmp);
+         //   cout<<i<<" "<<tmp<<endl;
+            update(i,node(0,tmp));
+        }
+        while(1){
+            scanf("%s",s);
+            if(s[0]=='E'){
+                break;
+            }
+            //cout<<s<<" "<<t1<<" "<<t2<<endl;
+            scanf("%d%d",&t1,&t2);
+            if(s[0]=='A'){
+                    update(t1,node(0,t2));
+            }else if(s[0]=='S'){
+                   update(t1,node(0,-t2));
+            }else if(s[0]=='Q'){
+                cout<<getSum(t2).kind-getSum(t1-1).kind<<endl;
+            }
+        }
+        for(int i=0;i<=n;i++){
+            b[i].kind=0;
+        }
+    }
+    return 0;
+}
