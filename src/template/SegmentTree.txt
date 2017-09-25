@@ -1,0 +1,104 @@
+//hdu1166
+
+#include<iostream>
+#include<cstdio>
+#include<cstdlib>
+#include<cstring>
+#include<string.h>
+#include<algorithm>
+using namespace std;
+#define maxn 250000
+
+int num[maxn];
+int sum[maxn];
+
+
+void pushUp(int rt){
+	sum[rt] = sum[rt<<1] + sum[rt<<1|1];
+}
+
+void build(int rt,int l,int r){
+	if(l==r){
+		sum[rt]=num[l];
+        return;
+	}
+	
+	int mid = (l+r)>>1;
+	build(rt<<1,l,mid);
+	build(rt<<1|1,mid+1,r);
+	pushUp(rt);
+    // cout<<rt<<" "<<l<<" "<<r<<" "<<sum[rt]<<endl;
+}
+
+void update(int index,int val,int rt,int l,int r){
+	if(l==r){
+		sum[rt]+=val;
+		return ;
+	}
+	int mid =(l+r)>>1;
+	if(index>mid)
+		update(index,val,rt<<1|1,mid+1,r);
+	else
+		update(index,val,rt<<1,l,mid);
+	pushUp(rt);
+}
+
+int query(int left,int right,int rt,int l,int r){
+	if(l>=left && r <= right) 
+		return sum[rt];
+	int mid = (l+r)>>1;
+	int ret = 0;
+	if(left<=mid)
+		ret+=query(left,right,rt<<1,l,mid);
+	if(right>mid)
+		ret+=query(left,right,rt<<1|1,mid+1,r);
+	return ret;
+}
+
+
+
+int n;
+char s[100];
+int main()
+{
+	
+
+   // freopen("in.txt","r",stdin);
+
+    int cas;
+    scanf("%d",&cas);
+   // cout<<cas<<endl;
+    int tmp,t1,t2;
+    for(int ca=1;ca<=cas;ca++){
+    	memset(sum,0,sizeof(sum));
+        cout<<"Case "<<ca<<":"<<endl;
+        scanf("%d",&n);
+        for(int i=1;i<=n;i++){
+            scanf("%d",&tmp);
+         //   cout<<i<<" "<<tmp<<endl;
+            // update(i,node(0,tmp));
+            	num[i]=tmp;
+        }
+        // for(int i=1;i<=n;i++)
+        //     cout<<i<<" i"<<num[i]<<endl;
+        build(1,1,n);
+
+        while(1){
+            scanf("%s",s);
+            if(s[0]=='E'){
+                break;
+            }
+            //cout<<s<<" "<<t1<<" "<<t2<<endl;
+            scanf("%d%d",&t1,&t2);
+            if(s[0]=='A'){
+                    update(t1,t2,1,1,n);
+            }else if(s[0]=='S'){
+                   update(t1,-t2,1,1,n);
+            }else if(s[0]=='Q'){
+               cout<<query(t1,t2,1,1,n)<<endl;
+            }
+        }
+     
+    }
+    return 0;
+}
