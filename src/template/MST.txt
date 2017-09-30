@@ -1,0 +1,114 @@
+hdu 1102
+#include<iostream>
+#include<cstdio>
+#include<cstdlib>
+#include<cstring>
+#include<string.h>
+#include<algorithm>
+using namespace std;
+#define maxn 200
+#define maxm 40000
+int edgeNum[maxn][maxn];
+
+int em,n;
+
+struct Edge{
+	int x;
+	int y;
+	int w;
+	int next;
+	bool operator<(const Edge &tmp)const{
+		return w<tmp.w;
+	}
+}edge[maxm];
+
+int head[maxn];
+int fa[maxn];
+
+void addedge(int x,int y,int w){
+	edge[em].x=x;
+	edge[em].y=y;
+	edge[em].w=w;
+	edge[em].next=head[x];
+	head[x]=em++;
+	
+}
+
+
+void init(){
+	em=0;
+	memset(head,-1,sizeof(head));
+	for(int i=1;i<=n;i++)
+		fa[i]=i;
+}
+
+void dfs(int x){
+	// cout<<"dfs  "<<x<<endl;
+	for(int i=head[x];~i;i=edge[i].next){
+		// cout<<edge[i].y<<endl;
+		dfs(edge[i].y);
+	}
+}
+
+int find(int x){
+	if(fa[x]!=x){
+		// cout<<x<<" fa "<<fa[x]<<endl;
+		fa[x]=find(fa[x]);
+	}
+	return fa[x];
+}
+
+void Union(int x,int y){
+	fa[x]=y;
+}
+
+
+int main(){
+	
+	// freopen("in.txt","r",stdin);
+	while(scanf("%d",&n)!=EOF){
+		// cout<<n<<endl;
+		init();
+		for(int i=1;i<=n;i++){
+			for(int j=1;j<=n;j++){
+				int w;
+				scanf("%d",&w);
+				if(i<=j) continue;
+				addedge(i,j,w);
+				edgeNum[i][j]=em-1;
+			}
+		}
+		int m,t1,t2;
+		scanf("%d",&m);
+		for(int i=0;i<m;i++){
+			scanf("%d%d",&t1,&t2);
+			
+			int tmax=max(t1,t2);
+			int tmin = min(t1,t2);
+			edge[edgeNum[tmax][tmin]].w=0;
+		
+		}
+		sort(edge,edge+em);
+		int num=0;
+		// for(int i=0;i<em;i++){
+		// cout<<edge[i].x<<" "<<edge[i].y<<" "<<edge[i].w<<endl;
+		// }
+		for(int i=0;i<em;i++){
+			t1=edge[i].x;
+			t2=edge[i].y;
+			t1=find(t1);
+			t2=find(t2);
+			if(find(t1) != find(t2)){
+				Union(t1,t2);
+				num+=edge[i].w;
+				// cout<<edge[i].w<<endl;
+			}
+
+		}
+		cout<<num<<endl;
+		
+	}
+	// dfs(1);
+	// cout<<"MST"<<endl;
+	return 0;
+}
