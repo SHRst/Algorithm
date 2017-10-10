@@ -1,0 +1,108 @@
+//POJ 1330
+#include<iostream>
+#include<cstdio>
+#include<cstdlib>
+#include<cstring>
+#include<string.h>
+#include<algorithm>
+using namespace std;
+#define maxn 30000
+#define maxm 60000
+#define maxd 21
+int head[maxn];
+int fa[maxn][25];
+int depth[maxn];
+int n,em;
+struct Edge
+{
+	int u,v,next,w;
+	/* data */
+}edge[maxm];
+
+
+void init(){
+	em=0;
+	memset(head,-1,sizeof(head));
+
+}
+
+void addedge(int u,int v,int w){
+	edge[em].u=u;
+	edge[em].v=v;
+	edge[em].w=w;
+	edge[em].next=head[u];
+	head[u]=em++;
+}
+
+void dfs(int x,int father,int dep){
+	fa[x][0]=father;
+	depth[x]=dep;
+	for(int i=1;i<maxd;i++){
+		fa[x][i]=fa[fa[x][i-1]][i-1];
+	}
+	for(int i=head[x];~i;i=edge[i].next){
+		int v= edge[i].v;
+		if(v==father) continue;
+		dfs(v,x,dep+1);
+	}
+
+}
+
+
+int lca(int x,int y){
+	if(depth[x]<depth[y])
+		swap(x,y);
+	int len = depth[x]-depth[y];
+	for(int i=0;i<maxd;i++){
+		if(len&1)
+			x=fa[x][i];
+		len>>=1;
+	}
+	if(x==y) return x;
+	for(int i=maxd-1;i>=0;i--){
+		if(fa[x][i]==fa[y][i])
+			continue;
+		x=fa[x][i];
+		y=fa[y][i];
+	}
+	return fa[x][0];
+}
+
+
+bool vis[maxn];
+int u,v;
+
+int main(){
+	// freopen("in.txt","r",stdin);
+	int cas;
+	scanf("%d",&cas);
+	for(int ca=1;ca<=cas;ca++){
+
+		init();
+		memset(vis,false,sizeof(vis));
+		scanf("%d",&n);
+		for(int i=1;i<n;i++){
+			scanf("%d%d",&u,&v);
+			addedge(u,v,0);
+			addedge(v,u,0);
+			vis[v]=true;
+		}
+		for(int i=1;i<=n;i++){
+			if(!vis[i]){
+				dfs(i,i,0);
+				break;
+			}
+		}
+		scanf("%d%d",&u,&v);
+		printf("%d\n",lca(u,v));
+	}
+	return 0;
+}
+
+
+
+
+
+
+
+
