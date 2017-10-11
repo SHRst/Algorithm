@@ -1,0 +1,89 @@
+//poj 3461
+
+#include<iostream>
+#include<cstdio>
+#include<cstdlib>
+#include<cstring>
+#include<string.h>
+#include<algorithm>
+using namespace std;
+#define maxt 1000100
+#define maxn 1000100
+
+char s[maxn],t[maxt];
+int nxt[maxt];
+
+
+int slen,tlen;
+
+
+void getnxt(){
+	nxt[0]=-1;
+	int j=-1;
+	int i=0;
+	while(i<tlen && j<tlen){
+		if(j==-1 || t[i]==t[j])
+			nxt[++i]=++j;
+		else
+			j=nxt[j];
+	}
+	// for(int i=0;i<tlen;i++)
+	// 	cout<<i<<" "<<nxt[i]<<endl;
+}
+
+int KMP_index(){
+	getnxt();
+	int i=0,j=0;
+	while(i<slen && j<tlen){
+		if(j==-1 || s[i]==t[j]){
+			i++,j++;
+		}else{
+			j=nxt[j];
+		}
+	}
+	if(j==tlen)
+		return i-tlen;
+	return -1;
+}
+
+int KMP_sum(){
+	int ans =0 ;
+	if(slen == 1 && tlen == 1) {
+		return s[0] == t[0];
+	}
+	getnxt();
+	for(int i=0,j=0;i<slen;i++){
+		while(j>0 && s[i]!=t[j]){
+			j=nxt[j];
+		}
+		// cout<<i<<" "<<j<<endl;
+		if(s[i]==t[j])
+		j++;
+		if(j==tlen){
+			ans++;
+			j=nxt[j];
+		}
+	}
+
+ 	return ans;
+}
+
+int main()
+{
+
+    int TT;
+    // freopen("in.txt","r",stdin);
+    scanf("%d",&TT);
+    while(TT--)
+    {
+        scanf("%s",t);
+        scanf("%s",s);
+        // cout<<t<<s<<endl;
+
+        slen = strlen(s);
+        tlen = strlen(t);
+
+       printf("%d\n",KMP_sum());
+    }
+    return 0;
+}
